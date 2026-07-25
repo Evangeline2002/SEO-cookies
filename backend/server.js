@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pool from './config/db.js';
+import { initDatabase } from './config/db-init.js';
 import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
 import productRoutes from './routes/products.js';
@@ -50,8 +51,10 @@ async function init() {
     try {
         await pool.query('SELECT 1');
         console.log('MySQL connected');
+        await initDatabase();
     } catch (err) {
         console.error('MySQL connection error:', err.message);
+        process.exit(1);
     }
 
     const PORT = process.env.PORT || 5000;

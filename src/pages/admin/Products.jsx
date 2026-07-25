@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineSearch } from 'react-icons/hi';
 import { toast } from 'react-toastify';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../../services/adminService';
+import { getProducts, createProduct, updateProduct, deleteProduct, getCategories } from '../../services/adminService';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -21,6 +22,12 @@ export default function Products() {
   };
 
   useEffect(() => { fetchProducts(); }, [search]);
+
+  useEffect(() => {
+    getCategories()
+      .then(({ data }) => setCategories(data))
+      .catch(() => { });
+  }, []);
 
   const openAdd = () => {
     setEditingProduct(null);
@@ -148,6 +155,15 @@ export default function Products() {
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">Product Name *</label>
                 <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Category</label>
+                <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 outline-none bg-white">
+                  <option value="">-- Select Category --</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>

@@ -1,11 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
-import { useCart } from './context/CartContext';
-import CartDrawer from './components/CartDrawer';
 import SEO from './components/SEO';
 import { websiteSchema, orgSchema } from './utils/structuredData';
+import CustomerLayout from './components/CustomerLayout';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
@@ -37,56 +34,51 @@ import AdminSEOSettings from './pages/admin/SEOSettings';
 import AdminProfile from './pages/admin/AdminProfile';
 
 function App() {
-  const { isCartOpen, setIsCartOpen } = useCart();
-
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
       <SEO schema={[websiteSchema, orgSchema]} />
       <ScrollToTop />
 
-      <Navbar onCartClick={() => setIsCartOpen(true)} />
-
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-
-      <div className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/recipes" element={<Recipes />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/place-order" element={<Checkout />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
-          <Route path="/cookies" element={<CookieMenu />} />
-          <Route path="/gift-boxes" element={<GiftBoxes />} />
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="products" element={<AdminProducts />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="orders" element={<AdminOrders />} />
-            <Route path="customers" element={<AdminCustomers />} />
-            <Route path="recipes" element={<AdminRecipes />} />
-            <Route path="gift-boxes" element={<AdminGiftBoxes />} />
-            <Route path="reviews" element={<AdminReviews />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
-            <Route path="seo" element={<AdminSEOSettings />} />
-            <Route path="profile" element={<AdminProfile />} />
-            <Route path="website-settings" element={<AdminSettings />} />
-            <Route path="settings" element={<AdminSettings />} />
-            <Route index element={<Dashboard />} />
-          </Route>
+      <Routes>
+        {/* Customer Routes with Header/Footer */}
+        <Route path="/" element={<CustomerLayout />}>
+          <Route index element={<Home />} />
+          <Route path="shop" element={<Shop />} />
+          <Route path="product/:id" element={<ProductDetail />} />
+          <Route path="about" element={<About />} />
+          <Route path="recipes" element={<Recipes />} />
+          <Route path="blog" element={<Blog />} />
+          <Route path="faq" element={<FAQ />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="checkout" element={<Checkout />} />
+          <Route path="place-order" element={<Checkout />} />
+          <Route path="order-success" element={<OrderSuccess />} />
+          <Route path="cookies" element={<CookieMenu />} />
+          <Route path="gift-boxes" element={<GiftBoxes />} />
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
+        </Route>
 
-      <Footer />
+        {/* Admin Routes — completely separate from customer layout */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="customers" element={<AdminCustomers />} />
+          <Route path="recipes" element={<AdminRecipes />} />
+          <Route path="gift-boxes" element={<AdminGiftBoxes />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="seo" element={<AdminSEOSettings />} />
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="website-settings" element={<AdminSettings />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+      </Routes>
     </div>
   );
 }

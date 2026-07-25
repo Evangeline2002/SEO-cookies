@@ -54,7 +54,7 @@ export default function Checkout() {
   const shipping = cartTotal > 0 ? (cartTotal >= 499 ? 0 : 49) : 0;
   const totalAmount = cartTotal + shipping;
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (!paymentMethod) {
       toast.error('Please select a payment method', {
         style: { borderRadius: '16px' }
@@ -64,58 +64,90 @@ export default function Checkout() {
 
     const orderId = `#CKH${Math.floor(10000 + Math.random() * 90000)}`;
 
-    const lines = [
-      `🍪 *COOKIE HEAVEN — Order Confirmation*`,
-      `────────────────────────`,
-      `🆔 *Order ID:* ${orderId}`,
-      `👤 *Name:* ${data.name}`,
-      `📱 *Phone:* ${data.phone}`,
-      `🏠 *Address:* ${data.address}`,
-      `💳 *Payment:* ${paymentMethod}`,
-      `────────────────────────`,
-      ``,
-      `*Order Items:*`
-    ];
+    try {
+      // 1. Save to Database FIRST
+      const orderPayload = {
+        order_number: orderId,
+        customer_name: data.name,
+        email: user?.email || '',
+        phone: data.phone,
+        address: data.address,
+        payment_method: paymentMethod,
+        total_amount: totalAmount,
+        items: cart
+      };
 
-    cart.forEach((item, i) => {
-      lines.push(`${i + 1}. ${item.name}`);
-      lines.push(`   Qty: ${item.quantity} × ₹${item.price} = ₹${item.price * item.quantity}`);
-    });
+      const res = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+      });
 
-    lines.push(``);
-    lines.push(`────────────────────────`);
-    lines.push(`🚚 *Delivery:* ${shipping === 0 ? 'Free' : '₹' + shipping}`);
-    lines.push(`💰 *Total: ₹${totalAmount}*`);
-    lines.push(``);
-    lines.push(`Please confirm my order. Thank you! 🙏`);
-
-    const message = lines.join('\n');
-    const encoded = encodeURIComponent(message);
-    const url = `https://wa.me/${STORE_WHATSAPP}?text=${encoded}`;
-
-    toast.success(
-      <div>
-        <div className="font-semibold text-gray-900 text-base">🎉 Order Placed Successfully!</div>
-        <div className="text-sm text-gray-500 mt-1">
-          Thank you for your order. Your freshly baked cookies are now being prepared.
-        </div>
-        <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-400">
-          Estimated Delivery: <span className="font-medium text-gray-600">30–45 Minutes</span>
-          <br />
-          Order ID: <span className="font-medium text-gray-600">{orderId}</span>
-        </div>
-      </div>,
-      {
-        autoClose: 5000,
-        style: { borderRadius: '16px', padding: '16px 20px', width: '360px' }
+      if (!res.ok) {
+        throw new Error('Failed to save order to database');
       }
-    );
 
-    clearCart();
+      // 2. Build WhatsApp String
+      const lines = [
+        `🍪 *COOKIE HEAVEN — Order Confirmation*`,
+        `────────────────────────`,
+        `🆔 *Order ID:* ${orderId}`,
+        `👤 *Name:* ${data.name}`,
+        `📱 *Phone:* ${data.phone}`,
+        `🏠 *Address:* ${data.address}`,
+        `💳 *Payment:* ${paymentMethod}`,
+        `────────────────────────`,
+        ``,
+        `*Order Items:*`
+      ];
 
-    setTimeout(() => {
-      navigate('/order-success', { state: { orderId, totalAmount, paymentMethod, name: data.name } });
-    }, 1500);
+      cart.forEach((item, i) => {
+        lines.push(`${i + 1}. ${item.name}`);
+        lines.push(`   Qty: ${item.quantity} × ₹${item.price} = ₹${item.price * item.quantity}`);
+      });
+
+      lines.push(``);
+      lines.push(`────────────────────────`);
+      lines.push(`🚚 *Delivery:* ${shipping === 0 ? 'Free' : '₹' + shipping}`);
+      lines.push(`💰 *Total: ₹${totalAmount}*`);
+      lines.push(``);
+      lines.push(`Please confirm my order. Thank you! 🙏`);
+
+      const message = lines.join('\n');
+      const encoded = encodeURIComponent(message);
+      const url = `https://wa.me/${STORE_WHATSAPP}?text=${encoded}`;
+
+      // 3. Open WhatsApp in new tab
+      window.open(url, '_blank');
+
+      toast.success(
+        <div>
+          <div className="font-semibold text-gray-900 text-base">🎉 Order Placed Successfully!</div>
+          <div className="text-sm text-gray-500 mt-1">
+            Thank you for your order. Your freshly baked cookies are now being prepared.
+          </div>
+          <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-400">
+            Estimated Delivery: <span className="font-medium text-gray-600">30–45 Minutes</span>
+            <br />
+            Order ID: <span className="font-medium text-gray-600">{orderId}</span>
+          </div>
+        </div>,
+        {
+          autoClose: 5000,
+          style: { borderRadius: '16px', padding: '16px 20px', width: '360px' }
+        }
+      );
+
+      clearCart();
+
+      setTimeout(() => {
+        navigate('/order-success', { state: { orderId, totalAmount, paymentMethod, name: data.name } });
+      }, 1500);
+
+    } catch (err) {
+      toast.error('Error placing order. Please try again.');
+      console.error(err);
+    }
   };
 
   if (!isLoggedIn || cart.length === 0) return null;
@@ -235,11 +267,11 @@ export default function Checkout() {
                     className={`flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all ${paymentMethod === option.id
                       ? 'border-[#8B4513] bg-[#8B4513]/5'
                       : 'border-gray-100 hover:border-[#8B4513]/30 hover:bg-gray-50'
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod(option.id)}
                   >
                     <div className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center flex-shrink-0 transition-all ${paymentMethod === option.id ? 'border-[#8B4513] bg-[#8B4513]' : 'border-gray-300'
-                    }`}>
+                      }`}>
                       {paymentMethod === option.id && (
                         <motion.div
                           initial={{ scale: 0 }}

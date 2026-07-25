@@ -20,7 +20,7 @@ api.interceptors.response.use(
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminUser');
             if (window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/login')) {
-                window.location.href = '/admin';
+                window.location.href = '/admin/login';
             }
         }
         return Promise.reject(error);

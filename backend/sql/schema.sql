@@ -9,9 +9,6 @@ CREATE TABLE IF NOT EXISTS admins (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO admins (name, email, password) VALUES
-('Admin', 'admin@cookieheaven.com', '$2a$10$dummyhashplaceholderreplacewithbcrypt');
-
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -76,27 +73,29 @@ CREATE TABLE IF NOT EXISTS customers (
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_number VARCHAR(20) NOT NULL UNIQUE,
-    customer_id INT,
     customer_name VARCHAR(100) NOT NULL,
-    customer_email VARCHAR(100),
-    customer_phone VARCHAR(20),
-    total_amount DECIMAL(10,2) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    address TEXT,
+    city VARCHAR(100),
+    state VARCHAR(100),
+    postal_code VARCHAR(20),
     payment_method VARCHAR(50),
-    status ENUM('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled') DEFAULT 'Pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
+    payment_status ENUM('Pending', 'Paid', 'Failed', 'Refunded') DEFAULT 'Pending',
+    order_status ENUM('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled') DEFAULT 'Pending',
+    total_amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
-    product_id INT,
     product_name VARCHAR(200),
+    product_image VARCHAR(255),
     quantity INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+    subtotal DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS reviews (
@@ -123,14 +122,6 @@ CREATE TABLE IF NOT EXISTS seo_settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO seo_settings (page, meta_title, meta_description) VALUES
-('home', 'Cookie Heaven | Freshly Baked Premium Cookies', 'Discover freshly baked cookies made with premium ingredients.'),
-('about', 'About Cookie Heaven | Our Story', 'Learn about our journey of baking premium cookies.'),
-('shop', 'Shop Cookies | Cookie Heaven', 'Browse our collection of gourmet cookies.'),
-('recipes', 'Cookie Recipes | Cookie Heaven', 'Discover our favorite cookie recipes.'),
-('gift-boxes', 'Gift Boxes | Cookie Heaven', 'Beautiful gift boxes for every occasion.'),
-('contact', 'Contact Us | Cookie Heaven', 'Get in touch with Cookie Heaven.');
-
 CREATE TABLE IF NOT EXISTS website_settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     site_name VARCHAR(100) DEFAULT 'Cookie Heaven',
@@ -144,6 +135,3 @@ CREATE TABLE IF NOT EXISTS website_settings (
     twitter_url VARCHAR(255),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
-INSERT INTO website_settings (id, site_name, tagline, contact_email, contact_phone, address) VALUES
-(1, 'Cookie Heaven', 'Where every cookie tells a story', 'hello@cookieheaven.com', '(555) 123-4567', '123 Bakery Lane, Sweet Town, ST 12345');

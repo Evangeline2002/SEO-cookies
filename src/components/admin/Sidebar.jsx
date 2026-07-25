@@ -30,14 +30,13 @@ export default function Sidebar() {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
-    navigate('/admin');
+    navigate('/admin/login');
   };
 
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${
-      isActive
-        ? 'bg-[#8B4513] text-white shadow-lg shadow-[#8B4513]/30'
-        : 'text-gray-600 hover:bg-[#8B4513]/10 hover:text-[#8B4513]'
+    `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${isActive
+      ? 'bg-[#8B4513] text-white shadow-lg shadow-[#8B4513]/30'
+      : 'text-gray-600 hover:bg-[#8B4513]/10 hover:text-[#8B4513]'
     }`;
 
   const sidebarContent = (
@@ -95,9 +94,8 @@ export default function Sidebar() {
       )}
 
       <aside
-        className={`fixed top-0 left-0 z-40 h-full w-64 bg-white border-r border-gray-100 shadow-xl shadow-gray-200/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 z-40 h-full w-64 bg-white border-r border-gray-100 shadow-xl shadow-gray-200/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {sidebarContent}
       </aside>
