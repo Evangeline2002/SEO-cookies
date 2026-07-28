@@ -32,6 +32,8 @@ import AdminSettings from './pages/admin/Settings';
 import AdminAnalytics from './pages/admin/Analytics';
 import AdminSEOSettings from './pages/admin/SEOSettings';
 import AdminProfile from './pages/admin/AdminProfile';
+import Invoices from './pages/admin/Invoices';
+import WhatsAppNotifications from './pages/admin/WhatsAppNotifications';
 
 function App() {
   return (
@@ -68,6 +70,8 @@ function App() {
           <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="invoices" element={<Invoices />} />
+          <Route path="whatsapp" element={<WhatsAppNotifications />} />
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="recipes" element={<AdminRecipes />} />
           <Route path="gift-boxes" element={<AdminGiftBoxes />} />

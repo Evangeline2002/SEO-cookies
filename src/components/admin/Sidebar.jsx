@@ -5,7 +5,9 @@ import {
   HiOutlineClipboardList, HiOutlineUsers, HiOutlineBookOpen,
   HiOutlineGift, HiOutlineStar, HiOutlineLogout,
   HiOutlineMenuAlt2, HiOutlineX, HiOutlineCake,
-  HiOutlineChartBar, HiOutlineSearchCircle, HiOutlineGlobe, HiOutlineUser
+  HiOutlineChartBar, HiOutlineSearchCircle, HiOutlineGlobe, HiOutlineUser,
+  HiOutlineDocumentText,
+  HiOutlineChatAlt2
 } from 'react-icons/hi';
 
 const navItems = [
@@ -15,6 +17,8 @@ const navItems = [
   { to: '/admin/gift-boxes', label: 'Gift Boxes', icon: HiOutlineGift },
   { to: '/admin/recipes', label: 'Recipes', icon: HiOutlineBookOpen },
   { to: '/admin/orders', label: 'Orders', icon: HiOutlineClipboardList },
+  { to: '/admin/invoices', label: 'Invoices', icon: HiOutlineDocumentText },
+  { to: '/admin/whatsapp', label: 'WhatsApp', icon: HiOutlineChatAlt2 },
   { to: '/admin/customers', label: 'Customers', icon: HiOutlineUsers },
   { to: '/admin/reviews', label: 'Reviews', icon: HiOutlineStar },
   { to: '/admin/analytics', label: 'Analytics', icon: HiOutlineChartBar },

@@ -135,3 +135,18 @@ CREATE TABLE IF NOT EXISTS website_settings (
     twitter_url VARCHAR(255),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS whatsapp_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    invoice_number VARCHAR(50),
+    customer_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    message_status ENUM('Pending', 'Sent', 'Delivered', 'Failed') DEFAULT 'Pending',
+    message_id VARCHAR(255),
+    invoice_url VARCHAR(500),
+    sent_at TIMESTAMP NULL,
+    delivered_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+);

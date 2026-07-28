@@ -62,18 +62,20 @@ export default function Checkout() {
       return;
     }
 
-    const orderId = `#CKH${Math.floor(10000 + Math.random() * 90000)}`;
-
     try {
       // 1. Save to Database FIRST
       const orderPayload = {
-        order_number: orderId,
         customer_name: data.name,
         email: user?.email || '',
         phone: data.phone,
         address: data.address,
         payment_method: paymentMethod,
         total_amount: totalAmount,
+        subtotal: cartTotal,
+        delivery_charge: shipping,
+        discount: 0,
+        tax: 0,
+        grand_total: totalAmount,
         items: cart
       };
 
@@ -87,11 +89,17 @@ export default function Checkout() {
         throw new Error('Failed to save order to database');
       }
 
+      const responseData = await res.json();
+      const orderId = responseData.order_number;
+      const invoiceNumber = responseData.invoice_number;
+      const pdfPath = responseData.pdf_path;
+
       // 2. Build WhatsApp String
       const lines = [
         `🍪 *COOKIE HEAVEN — Order Confirmation*`,
         `────────────────────────`,
         `🆔 *Order ID:* ${orderId}`,
+        `📄 *Invoice No:* ${invoiceNumber}`,
         `👤 *Name:* ${data.name}`,
         `📱 *Phone:* ${data.phone}`,
         `🏠 *Address:* ${data.address}`,
@@ -141,7 +149,7 @@ export default function Checkout() {
       clearCart();
 
       setTimeout(() => {
-        navigate('/order-success', { state: { orderId, totalAmount, paymentMethod, name: data.name } });
+        navigate('/order-success', { state: { orderId, invoiceNumber, pdfPath, totalAmount, paymentMethod, name: data.name } });
       }, 1500);
 
     } catch (err) {

@@ -16,6 +16,8 @@ import customerRoutes from './routes/customers.js';
 import reviewRoutes from './routes/reviews.js';
 import seoRoutes from './routes/seo.js';
 import settingRoutes from './routes/settings.js';
+import invoiceRoutes from './routes/invoices.js';
+import whatsappRoutes from './routes/whatsapp.js';
 
 dotenv.config();
 
@@ -27,6 +29,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/invoices', express.static(path.join(__dirname, 'public', 'invoices')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -40,6 +43,8 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/settings', settingRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

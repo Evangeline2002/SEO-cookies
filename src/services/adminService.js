@@ -59,3 +59,8 @@ export const updateSEOSetting = (id, data) => api.put(`/seo/${id}`, data);
 // Settings
 export const getWebsiteSettings = () => api.get('/settings');
 export const updateWebsiteSettings = (data) => api.put('/settings', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+// WhatsApp
+export const getWhatsAppLogs = () => api.get('/whatsapp/logs');
+export const sendWhatsApp = (orderId) => api.post(`/whatsapp/send/${orderId}`);
+export const resendWhatsApp = (id) => api.post(`/whatsapp/resend/${id}`);

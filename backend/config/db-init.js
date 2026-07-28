@@ -121,8 +121,50 @@ export async function initDatabase() {
             )
         `);
 
+        await conn.query(`
+            CREATE TABLE IF NOT EXISTS invoices (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                invoice_number VARCHAR(50) NOT NULL UNIQUE,
+                order_id INT,
+                customer_name VARCHAR(100) NOT NULL,
+                email VARCHAR(100),
+                phone VARCHAR(20),
+                subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                delivery_charge DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                discount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                tax DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                grand_total DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                payment_method VARCHAR(50),
+                payment_status VARCHAR(50),
+                pdf_path VARCHAR(255),
+                invoice_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+            )
+        `);
+
         // ── Schema Migrations (safely add missing columns) ─────────────────────
         const DB_NAME = conn.config?.database || process.env.DB_NAME || 'cookie_heaven';
+
+        const invoicesColumns = {
+            subtotal: "ADD COLUMN subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+            delivery_charge: "ADD COLUMN delivery_charge DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+            discount: "ADD COLUMN discount DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+            tax: "ADD COLUMN tax DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+            grand_total: "ADD COLUMN grand_total DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+            invoice_date: "ADD COLUMN invoice_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        };
+
+        for (const [col, ddl] of Object.entries(invoicesColumns)) {
+            const [cols] = await conn.query(
+                `SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='invoices' AND COLUMN_NAME=?`,
+                [DB_NAME, col]
+            );
+            if (cols.length === 0) {
+                await conn.query(`ALTER TABLE invoices ${ddl}`);
+                console.log(`✔ Migration: invoices.${col} added.`);
+            }
+        }
 
         const ordersColumns = {
             email: "ADD COLUMN email VARCHAR(100) NOT NULL DEFAULT ''",
@@ -205,6 +247,33 @@ export async function initDatabase() {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         `);
+
+        await conn.query(`
+            CREATE TABLE IF NOT EXISTS whatsapp_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                order_id INT,
+                invoice_number VARCHAR(50),
+                customer_name VARCHAR(100) NOT NULL,
+                phone_number VARCHAR(20) NOT NULL,
+                message_status ENUM('Pending', 'Sent', 'Delivered', 'Failed') DEFAULT 'Pending',
+                message_id VARCHAR(255),
+                invoice_url VARCHAR(500),
+                sent_at TIMESTAMP NULL,
+                delivered_at TIMESTAMP NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+            )
+        `);
+
+        // Migration: add message_id column if missing
+        const [msgCol] = await conn.query(
+            `SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='whatsapp_logs' AND COLUMN_NAME='message_id'`,
+            [DB_NAME]
+        );
+        if (msgCol.length === 0) {
+            await conn.query('ALTER TABLE whatsapp_logs ADD COLUMN message_id VARCHAR(255) AFTER message_status');
+            console.log('✔ Migration: whatsapp_logs.message_id added.');
+        }
 
         console.log('✔ All tables created successfully.');
 
