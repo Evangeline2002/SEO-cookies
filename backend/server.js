@@ -52,13 +52,27 @@ app.get('/api/health', (req, res) => {
 });
 
 // Init DB and start server
+async function connectWithRetry(attempts = 12, delayMs = 5000) {
+    for (let i = 1; i <= attempts; i++) {
+        try {
+            await pool.query('SELECT 1');
+            console.log('MySQL connected');
+            return;
+        } catch (err) {
+            console.error(`MySQL connection attempt ${i}/${attempts} failed:`, err.message);
+            if (i === attempts) throw err;
+            await new Promise((r) => setTimeout(r, delayMs));
+        }
+    }
+}
+
 async function init() {
     try {
-        await pool.query('SELECT 1');
-        console.log('MySQL connected');
+        await connectWithRetry();
         await initDatabase();
     } catch (err) {
-        console.error('MySQL connection error:', err.message);
+        console.error('Fatal: could not connect to MySQL:', err.message);
+        await pool.end();
         process.exit(1);
     }
 
@@ -69,3 +83,15 @@ async function init() {
 }
 
 init();
+
+// Gracefully close DB connections on shutdown so orphans don't accumulate
+async function shutdown(signal) {
+    console.log(`${signal} received, closing DB connections...`);
+    try {
+        await pool.end();
+    } finally {
+        process.exit(0);
+    }
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

@@ -10,8 +10,9 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'cookie_heaven',
     waitForConnections: true,
-    connectionLimit: 2,
-    queueLimit: 0
+    connectionLimit: 1,
+    queueLimit: 0,
+    connectTimeout: 10000
 });
 
 export default pool;
