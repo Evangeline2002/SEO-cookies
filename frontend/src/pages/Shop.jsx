@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiStar, FiShoppingCart, FiPlus } from 'react-icons/fi';
-import { products, CATEGORIES, SHOP_CATEGORIES } from '../utils/productData';
+import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import SEO from '../components/SEO';
 
@@ -20,32 +20,62 @@ export default function Shop() {
     const [activeCategory, setActiveCategory] = useState(catParam || 'All');
     const [sortBy, setSortBy] = useState('featured');
     const { addToCart } = useCart();
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Base URL for images
+    const imgBaseUrl = api.defaults.baseURL.replace('/api', '');
+
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                setLoading(true);
+                const [prodRes, catRes] = await Promise.all([
+                    api.get('/products'),
+                    api.get('/categories')
+                ]);
+                setProducts(prodRes.data);
+                setCategories(catRes.data);
+            } catch (err) {
+                console.error("Error fetching shop data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchInitialData();
+    }, []);
 
     // Filter products
     const filteredProducts = useMemo(() => {
         let result = [...products];
 
+        // Status is active
+        result = result.filter(p => p.status === 'Active');
+
         // Category filter
         if (activeCategory !== 'All') {
-            result = result.filter(p => p.category === activeCategory);
+            const catMatch = categories.find(c => c.category_name === activeCategory);
+            if (catMatch) result = result.filter(p => p.category_id === catMatch.id);
         }
 
         // Type queries
         if (typeParam === 'bestsellers') {
-            result = result.filter(p => p.bestseller);
+            result = result.filter(p => p.best_seller);
         } else if (typeParam === 'new') {
-            result = result.filter(p => p.badge === 'new');
+            result = result.filter(p => p.new_arrival);
         } else if (typeParam === 'offers' || typeParam === 'sale') {
-            result = result.filter(p => p.originalPrice);
+            result = result.filter(p => p.offer_price);
         }
 
         // Sort
         if (sortBy === 'price-low') result.sort((a, b) => a.price - b.price);
         else if (sortBy === 'price-high') result.sort((a, b) => b.price - a.price);
-        else if (sortBy === 'rating') result.sort((a, b) => b.rating - a.rating);
+        // Fallback for rating/reviews as they aren't fully dynamic yet
+        else if (sortBy === 'rating') result.sort((a, b) => (b.rating || 5) - (a.rating || 5));
 
         return result;
-    }, [activeCategory, typeParam, sortBy]);
+    }, [products, categories, activeCategory, typeParam, sortBy]);
 
     const handleCategoryClick = (cat) => {
         setActiveCategory(cat);
@@ -85,15 +115,18 @@ export default function Shop() {
 
                         <div className="space-y-6">
                             <div>
-                                <h3 className="font-semibold text-gray-700 mb-3 uppercase tracking-wider text-xs">Cookie Types</h3>
+                                <h3 className="font-semibold text-gray-700 mb-3 uppercase tracking-wider text-xs">Categories</h3>
                                 <ul className="space-y-2">
-                                    {CATEGORIES.map(cat => (
-                                        <li key={cat}>
+                                    <li>
+                                        <button onClick={() => handleCategoryClick('All')} className={`text-left w-full px-3 py-2 rounded-lg text-sm transition-all duration-200 ${activeCategory === 'All' ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-[var(--color-primary)]'}`}>All {activeCategory === 'All' && '✓'}</button>
+                                    </li>
+                                    {categories.map(cat => (
+                                        <li key={cat.id}>
                                             <button
-                                                onClick={() => handleCategoryClick(cat)}
-                                                className={`text-left w-full px-3 py-2 rounded-lg text-sm transition-all duration-200 ${activeCategory === cat ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-[var(--color-primary)]'}`}
+                                                onClick={() => handleCategoryClick(cat.category_name)}
+                                                className={`text-left w-full px-3 py-2 rounded-lg text-sm transition-all duration-200 ${activeCategory === cat.category_name ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-[var(--color-primary)]'}`}
                                             >
-                                                {cat} {cat === activeCategory && '✓'}
+                                                {cat.category_name} {cat.category_name === activeCategory && '✓'}
                                             </button>
                                         </li>
                                     ))}
@@ -142,25 +175,30 @@ export default function Shop() {
                                         >
                                             {/* Badges */}
                                             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                                                {product.badge && (
-                                                    <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full text-white shadow-sm ${product.badge === 'hot' ? 'bg-red-500' : 'bg-[var(--color-secondary)]'}`}>
-                                                        {product.badge}
+                                                {product.new_arrival ? (
+                                                    <span className="px-3 py-1 text-xs font-bold uppercase rounded-full text-white shadow-sm bg-[var(--color-secondary)]">
+                                                        NEW
                                                     </span>
-                                                )}
-                                                {product.originalPrice && (
+                                                ) : null}
+                                                {product.offer_price && (
                                                     <span className="bg-green-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-full shadow-sm">
                                                         Sale
+                                                    </span>
+                                                )}
+                                                {product.best_seller && (
+                                                    <span className="bg-orange-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-full shadow-sm">
+                                                        Hot
                                                     </span>
                                                 )}
                                             </div>
 
                                             {/* Fake Image Container */}
                                             <Link to={`/product/${product.id}`} className="block">
-                                                <div className="bg-[#FFFDF8] rounded-2xl h-56 mb-5 flex items-center justify-center text-7xl group-hover:scale-105 transition-transform duration-500 border border-[var(--color-primary)]/5 overflow-hidden relative">
-                                                    {product.img ? (
-                                                        <img src={product.img} alt={product.name} className="w-full h-full object-cover !scale-100" />
+                                                <div className="bg-[#FFFDF8] rounded-2xl h-56 mb-5 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 border border-[var(--color-primary)]/5 overflow-hidden relative">
+                                                    {product.product_image ? (
+                                                        <img src={`${imgBaseUrl}${product.product_image}`} alt={product.product_name} className="w-full h-full object-cover !scale-100" />
                                                     ) : (
-                                                        product.emoji
+                                                        <span className="text-7xl">🍪</span>
                                                     )}
                                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
                                                 </div>
@@ -170,24 +208,24 @@ export default function Shop() {
                                             <div className="flex flex-col flex-1">
                                                 <Link to={`/product/${product.id}`}>
                                                     <h3 className="font-bold text-lg text-[var(--color-text)] mb-1 leading-snug hover:text-[var(--color-primary)] transition-colors">
-                                                        {product.name}
+                                                        {product.product_name}
                                                     </h3>
                                                 </Link>
 
                                                 <div className="flex items-center gap-1 mb-3 text-yellow-400 text-sm">
                                                     <FiStar className="fill-current" />
-                                                    <span className="text-gray-500 font-medium ml-1">{product.rating} ({product.reviews})</span>
+                                                    <span className="text-gray-500 font-medium ml-1">{product.rating || 5} ({product.reviews || 0})</span>
                                                 </div>
 
                                                 <div className="mt-auto flex items-center justify-between pt-4">
                                                     <div className="flex flex-col">
-                                                        {product.originalPrice && (
+                                                        {product.offer_price && (
                                                             <span className="text-xs text-gray-400 line-through -mb-1">
-                                                                ₹{product.originalPrice}
+                                                                ₹{product.price}
                                                             </span>
                                                         )}
                                                         <span className="font-bold text-xl text-[var(--color-primary)] flex items-baseline gap-1">
-                                                            ₹{product.price}
+                                                            ₹{product.offer_price || product.price}
                                                         </span>
                                                     </div>
 

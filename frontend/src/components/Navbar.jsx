@@ -5,8 +5,9 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import logoImg from '../assets/logo.webp';
+import api from '../services/api';
 
-const mainLinks = [
+const staticLinks = [
     { label: 'Home', path: '/' },
     { label: 'About', path: '/about' },
     { label: 'Contact', path: '/contact' }
@@ -16,6 +17,7 @@ export default function Navbar({ onCartClick }) {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [mainLinks, setMainLinks] = useState(staticLinks);
     const { cartCount } = useCart();
     const { user, isLoggedIn, logout } = useAuth();
     const location = useLocation();
@@ -23,6 +25,24 @@ export default function Navbar({ onCartClick }) {
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
+
+        // Fetch Categories for Shop dropdown
+        api.get('/categories')
+            .then(res => {
+                const activeCats = res.data.filter(c => c.status === 'Active');
+                const catLinks = activeCats.map(c => ({
+                    label: c.category_name,
+                    path: `/shop?cat=${encodeURIComponent(c.category_name)}`
+                }));
+                // Insert Shop link after Home
+                setMainLinks([
+                    staticLinks[0],
+                    { label: 'Shop', path: '/shop', dropdown: catLinks },
+                    ...staticLinks.slice(1)
+                ]);
+            })
+            .catch(console.error);
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 

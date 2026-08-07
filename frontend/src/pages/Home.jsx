@@ -1,7 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiStar } from 'react-icons/fi';
-import { bestSellers } from '../utils/productData';
+import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import SEO from '../components/SEO';
 import HeroSection from '../components/HeroSection';
@@ -22,6 +23,25 @@ const stagger = {
 
 export default function Home() {
     const { addToCart } = useCart();
+    const [categories, setCategories] = useState([]);
+    const [bestSellers, setBestSellers] = useState([]);
+    const imgBaseUrl = api.defaults.baseURL.replace('/api', '');
+
+    useEffect(() => {
+        const fetchHomeData = async () => {
+            try {
+                const [catRes, prodRes] = await Promise.all([
+                    api.get('/categories'),
+                    api.get('/products')
+                ]);
+                setCategories(catRes.data.filter(c => c.status === 'Active').slice(0, 4));
+                setBestSellers(prodRes.data.filter(p => p.status === 'Active' && p.best_seller).slice(0, 4));
+            } catch (err) {
+                console.error("Error fetching home data:", err);
+            }
+        };
+        fetchHomeData();
+    }, []);
 
     return (
         <main className="min-h-screen overflow-hidden">
@@ -43,30 +63,29 @@ export default function Home() {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto">
-                        {[
-                            { label: 'Chocolate Chip', img: chocolateChipImg, to: '/shop' },
-                            { label: 'Healthy & Vegan', img: healthyVeganImg, to: '/shop?type=healthy' },
-                            { label: 'Premium Gift Boxes', img: giftBoxesImg, to: '/gift-boxes' },
-                            { label: 'Assorted Combos', img: assortedCombosImg, to: '/shop' },
-                        ].map((cat, i) => (
+                        {categories.map((cat, i) => (
                             <motion.div
-                                key={cat.label}
+                                key={cat.id}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, margin: "-50px" }}
                                 transition={{ delay: i * 0.1 }}
                             >
-                                <Link to={cat.to} className="group block h-full">
+                                <Link to={`/shop?cat=${encodeURIComponent(cat.category_name)}`} className="group block h-full">
                                     <div className="bg-[var(--color-background)] rounded-3xl p-4 md:p-6 text-center h-full flex flex-col items-center gap-4 border border-[var(--color-primary)]/10 hover:border-[var(--color-primary)]/40 hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2">
-                                        <div className="w-full h-36 sm:h-44 md:h-48 overflow-hidden rounded-2xl bg-gray-50 border border-[var(--color-primary)]/5">
-                                            <img
-                                                src={cat.img}
-                                                alt={cat.label}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                loading="lazy"
-                                            />
+                                        <div className="w-full h-36 sm:h-44 md:h-48 overflow-hidden rounded-2xl bg-[#FFFDF8] border border-[var(--color-primary)]/5 flex items-center justify-center">
+                                            {cat.category_image ? (
+                                                <img
+                                                    src={`${imgBaseUrl}${cat.category_image}`}
+                                                    alt={cat.category_name}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <span className="text-6xl">🍪</span>
+                                            )}
                                         </div>
-                                        <h3 className="font-bold text-gray-800 text-base md:text-lg leading-snug">{cat.label}</h3>
+                                        <h3 className="font-bold text-gray-800 text-base md:text-lg leading-snug">{cat.category_name}</h3>
                                         <span className="text-[var(--color-secondary)] font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">
                                             View All <FiArrowRight />
                                         </span>
@@ -98,46 +117,46 @@ export default function Home() {
                         viewport={{ once: true, margin: "-100px" }}
                         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
                     >
-                        {bestSellers.slice(0, 4).map(product => (
+                        {bestSellers.map(product => (
                             <motion.div key={product.id} variants={fadeIn} className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group relative flex flex-col h-full">
-                                {product.badge && (
-                                    <span className={`absolute top-4 left-4 z-10 px-3 py-1 text-xs font-bold uppercase rounded-full text-white ${product.badge === 'hot' ? 'bg-red-500' : 'bg-[var(--color-secondary)]'}`}>
-                                        {product.badge}
+                                {product.new_arrival && (
+                                    <span className="absolute top-4 left-4 z-10 px-3 py-1 text-xs font-bold uppercase rounded-full text-white bg-[var(--color-secondary)]">
+                                        NEW
                                     </span>
                                 )}
 
-                                <div className="bg-[var(--color-background)] rounded-2xl h-48 mb-6 flex items-center justify-center text-7xl group-hover:scale-110 transition-transform duration-500 overflow-hidden relative">
-                                    {product.img ? (
-                                        <img src={product.img} alt={`${product.name} cookie`} loading="lazy" className="w-full h-full object-cover !scale-100" />
+                                <div className="bg-[#FFFDF8] rounded-2xl h-48 mb-6 flex items-center justify-center text-7xl group-hover:scale-110 transition-transform duration-500 overflow-hidden relative">
+                                    {product.product_image ? (
+                                        <img src={`${imgBaseUrl}${product.product_image}`} alt={`${product.product_name} cookie`} loading="lazy" className="w-full h-full object-cover !scale-100" />
                                     ) : (
-                                        product.emoji
+                                        <span>🍪</span>
                                     )}
                                 </div>
 
                                 <h3 className="font-bold text-xl text-[var(--color-text)] mb-2 leading-tight">
                                     <Link to={`/product/${product.id}`} className="hover:text-[var(--color-primary)] transition-colors">
-                                        {product.name}
+                                        {product.product_name}
                                     </Link>
                                 </h3>
 
                                 <div className="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
                                     <FiStar className="fill-current" />
-                                    <span className="text-gray-600 font-medium ml-1">{product.rating} ({product.reviews})</span>
+                                    <span className="text-gray-600 font-medium ml-1">{product.rating || 5} ({product.reviews || 0})</span>
                                 </div>
 
                                 <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
                                     <div className="flex flex-col">
                                         <span className="text-sm text-gray-500 line-through">
-                                            {product.originalPrice ? `₹${product.originalPrice}` : ''}
+                                            {product.offer_price ? `₹${product.price}` : ''}
                                         </span>
                                         <span className="font-bold text-2xl text-[var(--color-primary)] flex items-baseline gap-1">
-                                            ₹{product.price} <span className="text-sm text-gray-500 font-normal">/ box</span>
+                                            ₹{product.offer_price || product.price} <span className="text-sm text-gray-500 font-normal">/ box</span>
                                         </span>
                                     </div>
                                     <button
                                         onClick={() => addToCart(product)}
                                         className="w-12 h-12 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center hover:bg-[var(--color-secondary)] transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1"
-                                        aria-label={`Add ${product.name} to cart`}
+                                        aria-label={`Add ${product.product_name} to cart`}
                                     >
                                         <span className="text-xl">+</span>
                                     </button>

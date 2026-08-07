@@ -204,6 +204,63 @@ export async function initDatabase() {
             }
         }
 
+        const categoryColumns = {
+            category_slug: "ADD COLUMN category_slug VARCHAR(100)",
+            category_image: "ADD COLUMN category_image VARCHAR(255)",
+            description: "ADD COLUMN description TEXT",
+            display_order: "ADD COLUMN display_order INT DEFAULT 0"
+        };
+        for (const [col, ddl] of Object.entries(categoryColumns)) {
+            const [cols] = await conn.query(
+                `SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='categories' AND COLUMN_NAME=?`,
+                [DB_NAME, col]
+            );
+            if (cols.length === 0) {
+                await conn.query(`ALTER TABLE categories ${ddl}`);
+                console.log(`✔ Migration: categories.${col} added.`);
+            }
+        }
+        // Rename name to category_name if exists
+        const [catNameCol] = await conn.query(`SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='categories' AND COLUMN_NAME='name'`, [DB_NAME]);
+        if (catNameCol.length > 0) {
+            await conn.query(`ALTER TABLE categories CHANGE name category_name VARCHAR(100) NOT NULL`);
+            console.log(`✔ Migration: categories.name renamed to category_name.`);
+        }
+
+        const productsNewColumns = {
+            product_slug: "ADD COLUMN product_slug VARCHAR(200)",
+            short_description: "ADD COLUMN short_description TEXT",
+            sku: "ADD COLUMN sku VARCHAR(50)",
+            weight: "ADD COLUMN weight VARCHAR(50)",
+            ingredients: "ADD COLUMN ingredients TEXT",
+            tags: "ADD COLUMN tags TEXT",
+            best_seller: "ADD COLUMN best_seller BOOLEAN DEFAULT FALSE",
+            new_arrival: "ADD COLUMN new_arrival BOOLEAN DEFAULT FALSE"
+        };
+        for (const [col, ddl] of Object.entries(productsNewColumns)) {
+            const [cols] = await conn.query(
+                `SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='products' AND COLUMN_NAME=?`,
+                [DB_NAME, col]
+            );
+            if (cols.length === 0) {
+                await conn.query(`ALTER TABLE products ${ddl}`);
+                console.log(`✔ Migration: products.${col} added.`);
+            }
+        }
+        // Rename product name, Original price, image
+        const productRenameMap = [
+            { old: 'name', new: 'product_name', type: 'VARCHAR(200) NOT NULL' },
+            { old: 'original_price', new: 'offer_price', type: 'DECIMAL(10,2)' },
+            { old: 'image', new: 'product_image', type: 'VARCHAR(255)' }
+        ];
+        for (const { old, new: newName, type } of productRenameMap) {
+            const [exists] = await conn.query(`SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='products' AND COLUMN_NAME=?`, [DB_NAME, old]);
+            if (exists.length > 0) {
+                await conn.query(`ALTER TABLE products CHANGE ?? ?? ${type}`, [old, newName]);
+                console.log(`✔ Migration: products.${old} renamed to ${newName}.`);
+            }
+        }
+
         await conn.query(`
             CREATE TABLE IF NOT EXISTS reviews (
                 id INT AUTO_INCREMENT PRIMARY KEY,
