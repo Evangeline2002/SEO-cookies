@@ -53,12 +53,12 @@ export default function AdminLogin() {
           {!showForgot ? (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Admin Email</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Login ID</label>
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@cookieheaven.com"
+                  placeholder="cookies123"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 outline-none transition-all bg-white"
                 />
               </div>
@@ -111,12 +111,12 @@ export default function AdminLogin() {
             <div className="space-y-5">
               <p className="text-sm text-gray-500">Enter your email and we'll send you a reset link.</p>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1.5">Admin Email</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1.5">Login ID</label>
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@cookieheaven.com"
+                  placeholder="cookies123"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 outline-none transition-all bg-white"
                 />
               </div>
