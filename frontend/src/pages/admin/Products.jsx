@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineSearch } from 'react-icons/hi';
 import { toast } from 'react-toastify';
 import { getProducts, createProduct, updateProduct, deleteProduct, getCategories } from '../../services/adminService';
+import api from '../../services/api';
 
 export default function Products() {
+  const imgBaseUrl = api.defaults.baseURL.replace('/api', '');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
@@ -143,7 +145,7 @@ export default function Products() {
                   <tr key={product.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {product.product_image && <img src={`http://localhost:5000${product.product_image}`} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                        {product.product_image && <img src={`${imgBaseUrl}${product.product_image}`} alt="" className="w-10 h-10 rounded-lg object-cover" />}
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-800">{product.product_name}</span>
                           <span className="text-xs text-gray-400">SKU: {product.sku || 'N/A'}</span>

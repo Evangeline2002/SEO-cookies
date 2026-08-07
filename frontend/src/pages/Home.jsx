@@ -34,7 +34,8 @@ export default function Home() {
                     api.get('/categories'),
                     api.get('/products')
                 ]);
-                setCategories(catRes.data.filter(c => c.status === 'Active').slice(0, 4));
+                const giftCategories = catRes.data.filter(c => c.status === 'Active' && (c.category_name.toLowerCase().includes('gift') || c.category_name.toLowerCase().includes('combo') || c.category_name.toLowerCase().includes('box') || c.category_name.toLowerCase().includes('healthy') || c.category_name.toLowerCase().includes('dessert')));
+                setCategories(giftCategories.length > 0 ? giftCategories.slice(0, 4) : catRes.data.filter(c => c.status === 'Active').slice(0, 4));
                 setBestSellers(prodRes.data.filter(p => p.status === 'Active' && p.best_seller).slice(0, 4));
             } catch (err) {
                 console.error("Error fetching home data:", err);
@@ -57,12 +58,12 @@ export default function Home() {
             {/* 2. Featured Categories */}
             <section className="py-20 px-4 bg-white relative">
                 <div className="container mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="section-title">Shop by Category</h2>
-                        <p className="section-subtitle">Find your perfect sweet treat from our premium collections</p>
+                    <div className="text-center mb-14">
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-[#8b4513] mb-4 font-['Poppins']">Find Your Perfect Treat</h2>
+                        <p className="text-gray-500 text-lg">The gifts and combos collections only</p>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         {categories.map((cat, i) => (
                             <motion.div
                                 key={cat.id}
@@ -72,22 +73,22 @@ export default function Home() {
                                 transition={{ delay: i * 0.1 }}
                             >
                                 <Link to={`/shop?cat=${encodeURIComponent(cat.category_name)}`} className="group block h-full">
-                                    <div className="bg-[var(--color-background)] rounded-3xl p-4 md:p-6 text-center h-full flex flex-col items-center gap-4 border border-[var(--color-primary)]/10 hover:border-[var(--color-primary)]/40 hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2">
-                                        <div className="w-full h-36 sm:h-44 md:h-48 overflow-hidden rounded-2xl bg-[#FFFDF8] border border-[var(--color-primary)]/5 flex items-center justify-center">
+                                    <div className="bg-[#FFFDF9] rounded-[24px] p-5 lg:p-6 text-center h-full flex flex-col items-center border border-[#F2E8DB] hover:shadow-xl transition-all duration-300">
+                                        <div className="w-full aspect-square overflow-hidden rounded-2xl mb-5 flex items-center justify-center bg-white shadow-sm border border-gray-50">
                                             {cat.category_image ? (
                                                 <img
                                                     src={`${imgBaseUrl}${cat.category_image}`}
                                                     alt={cat.category_name}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                                     loading="lazy"
                                                 />
                                             ) : (
                                                 <span className="text-6xl">🍪</span>
                                             )}
                                         </div>
-                                        <h3 className="font-bold text-gray-800 text-base md:text-lg leading-snug">{cat.category_name}</h3>
-                                        <span className="text-[var(--color-secondary)] font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all mt-auto">
-                                            View All <FiArrowRight />
+                                        <h3 className="font-bold text-[#1E293B] text-lg md:text-xl mb-3 leading-snug">{cat.category_name}</h3>
+                                        <span className="text-[#E07A5F] font-bold text-sm tracking-wide flex items-center gap-1 group-hover:gap-2 transition-all mt-auto pb-1">
+                                            View All <span className="font-normal">→</span>
                                         </span>
                                     </div>
                                 </Link>

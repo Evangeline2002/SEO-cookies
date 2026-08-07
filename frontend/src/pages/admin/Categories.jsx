@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi';
 import { toast } from 'react-toastify';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../../services/adminService';
+import api from '../../services/api';
 
 const defaultForm = { category_name: '', category_slug: '', description: '', display_order: '0', status: 'Active' };
 
 export default function Categories() {
+  const imgBaseUrl = api.defaults.baseURL.replace('/api', '');
   const [categories, setCategories] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -81,7 +83,7 @@ export default function Categories() {
         {categories.map((cat) => (
           <div key={cat.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
             <div className="flex flex-col mb-3 space-y-3">
-              {cat.category_image && <img src={`http://localhost:5000${cat.category_image}`} alt="" className="w-full h-32 rounded-lg object-cover" />}
+              {cat.category_image && <img src={`${imgBaseUrl}${cat.category_image}`} alt="" className="w-full h-32 rounded-lg object-cover" />}
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold text-gray-800">{cat.category_name}</h3>
