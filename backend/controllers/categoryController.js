@@ -1,4 +1,10 @@
 import pool from '../config/db.js';
+import { runSeeding } from '../scripts/seed-api.js';
+
+export const seedData = async (req, res) => {
+    const result = await runSeeding();
+    res.json(result);
+};
 
 export async function getAll(req, res) {
     try {
