@@ -7,8 +7,15 @@ import { getAll, getById, getByCategory, create, update, remove } from '../contr
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+import fs from 'fs';
+
+const uploadsDir = path.join(__dirname, '..', 'uploads', 'products');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-    destination: path.join(__dirname, '..', 'uploads'),
+    destination: uploadsDir,
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname.replace(/\\s+/g, '-')}`);
     }

@@ -20,6 +20,7 @@ export default function Products() {
   };
   const [form, setForm] = useState(defaultForm);
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchProducts = () => {
@@ -42,6 +43,7 @@ export default function Products() {
     setEditingProduct(null);
     setForm(defaultForm);
     setImage(null);
+    setImagePreview(null);
     setShowModal(true);
   };
 
@@ -66,7 +68,8 @@ export default function Products() {
       status: product.status || 'Active'
     });
     setImage(null);
-    setShowModal(true);
+    setImagePreview(product.product_image ? `${imgBaseUrl}/uploads/products/${product.product_image.replace(/^\\/uploads\\//, '')}` : null);
+      setShowModal(true);
   };
 
   const handleSave = async () => {
@@ -103,6 +106,11 @@ export default function Products() {
     } catch {
       toast.error('Failed to delete product');
     }
+  };
+
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    return `${imgBaseUrl}/uploads/products/${path.replace(/^\\/uploads\\//, '')}`;
   };
 
   return (
@@ -145,7 +153,13 @@ export default function Products() {
                   <tr key={product.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {product.product_image && <img src={`${imgBaseUrl}${product.product_image}`} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                        {product.product_image ? (
+                          <img src={getImageUrl(product.product_image)} alt={product.product_name} className="w-10 h-10 rounded-lg object-cover" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
+                            <span className="text-[10px] text-gray-400">No Img</span>
+                          </div>
+                        )}
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-800">{product.product_name}</span>
                           <span className="text-xs text-gray-400">SKU: {product.sku || 'N/A'}</span>
@@ -156,7 +170,7 @@ export default function Products() {
                     <td className="px-6 py-4 text-gray-800">${Number(product.price).toFixed(2)}</td>
                     <td className="px-6 py-4 text-gray-600">{product.stock}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${product.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{product.status}</span>
+                      <span className={`inline - block px - 3 py - 1 rounded - full text - xs font - semibold ${ product.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' } `}>{product.status}</span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -258,7 +272,26 @@ export default function Products() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">Product Image</label>
-                <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 outline-none bg-white file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-[#8B4513]/10 file:text-[#8B4513] file:font-medium file:text-sm" />
+                <div className="flex items-start gap-4">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="w-20 h-20 rounded-xl object-cover border border-gray-200 shadow-sm" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-200 border-dashed text-gray-400 text-xs text-center p-2">
+                       No Image
+                    </div>
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/jpeg, image/png, image/webp" 
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      setImage(file);
+                      if (file) setImagePreview(URL.createObjectURL(file));
+                      else setImagePreview(null);
+                    }} 
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 outline-none bg-white file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-[#8B4513]/10 file:text-[#8B4513] file:font-medium file:text-sm self-center hover:file:bg-[#8B4513]/20 cursor-pointer" 
+                  />
+                </div>
               </div>
             </div>
             <div className="flex gap-3 mt-6">

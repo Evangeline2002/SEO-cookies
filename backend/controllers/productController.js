@@ -35,7 +35,7 @@ export async function getByCategory(req, res) {
 export async function create(req, res) {
     try {
         const { product_name, category_id, product_slug, short_description, description, price, offer_price, stock, sku, weight, ingredients, tags, best_seller, featured, new_arrival, status } = req.body;
-        const product_image = req.file ? `/uploads/${req.file.filename}` : null;
+        const product_image = req.file ? req.file.filename : null;
 
         const [result] = await pool.query(
             'INSERT INTO products (product_name, category_id, product_slug, product_image, short_description, description, price, offer_price, stock, sku, weight, ingredients, tags, best_seller, featured, new_arrival, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -55,7 +55,7 @@ export async function update(req, res) {
 
         if (req.file) {
             sql += ', product_image=?';
-            params.push(`/uploads/${req.file.filename}`);
+            params.push(req.file.filename);
         }
 
         sql += ' WHERE id=?';
