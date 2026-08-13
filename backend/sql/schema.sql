@@ -150,3 +150,21 @@ CREATE TABLE IF NOT EXISTS whatsapp_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
 );
+CREATE TABLE IF NOT EXISTS invoices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_number VARCHAR(50),
+    order_id INT,
+    customer_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    subtotal DECIMAL(10,2),
+    delivery_charge DECIMAL(10,2),
+    discount DECIMAL(10,2),
+    tax DECIMAL(10,2),
+    grand_total DECIMAL(10,2),
+    payment_method VARCHAR(50),
+    payment_status ENUM('Pending', 'Paid', 'Failed', 'Refunded') DEFAULT 'Pending',
+    pdf_path VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+);
