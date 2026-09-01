@@ -26,23 +26,6 @@ export default function Navbar({ onCartClick }) {
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
 
-        // Fetch Categories for Shop dropdown
-        api.get('/categories')
-            .then(res => {
-                const activeCats = res.data.filter(c => c.status === 'Active');
-                const catLinks = activeCats.map(c => ({
-                    label: c.category_name,
-                    path: `/shop?cat=${encodeURIComponent(c.category_name)}`
-                }));
-                // Insert Shop link after Home
-                setMainLinks([
-                    staticLinks[0],
-                    { label: 'Shop', path: '/shop', dropdown: catLinks },
-                    ...staticLinks.slice(1)
-                ]);
-            })
-            .catch(console.error);
-
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -175,7 +158,7 @@ export default function Navbar({ onCartClick }) {
                                     )}
                                 </button>
 
-                                <Link to="/shop" className="hidden lg:inline-flex btn btn-primary py-2.5 px-6 ml-2 text-sm">
+                                <Link to="/order" className="hidden lg:inline-flex btn btn-primary py-2.5 px-6 ml-2 text-sm">
                                     Order Now
                                 </Link>
                             </div>
@@ -272,7 +255,7 @@ export default function Navbar({ onCartClick }) {
                                         <FiUser /> Login / Register
                                     </Link>
                                 )}
-                                <Link to="/shop" className="btn btn-primary w-full flex justify-center shadow-none">
+                                <Link to="/order" className="btn btn-primary w-full flex justify-center shadow-none">
                                     Order Now
                                 </Link>
                             </div>
