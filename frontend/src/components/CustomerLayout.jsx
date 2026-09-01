@@ -11,7 +11,7 @@ export default function CustomerLayout() {
         <div className="flex flex-col min-h-screen overflow-x-hidden">
             <Navbar onCartClick={() => setIsCartOpen(true)} />
             <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-            <div className="flex-grow">
+            <div className="flex-grow pt-[128px]">
                 <Outlet />
             </div>
             <Footer />

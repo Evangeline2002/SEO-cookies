@@ -53,134 +53,136 @@ export default function Navbar({ onCartClick }) {
 
     return (
         <>
-            {/* Top Banner */}
-            <div className="bg-[var(--color-primary)] text-white text-xs font-semibold py-2 px-4 text-center tracking-wide">
-                🍪 FREE SHIPPING ON ALL BOXES OVER ₹499! ORDER NOW FOR NEXT DAY DELIVERY 🚚
-            </div>
+            <div className="fixed top-0 left-0 w-full z-[9999]">
+                {/* Top Banner */}
+                <div className="bg-[var(--color-primary)] text-white text-xs font-semibold py-2 px-4 text-center tracking-wide">
+                    🍪 FREE SHIPPING ON ALL BOXES OVER ₹499! ORDER NOW FOR NEXT DAY DELIVERY 🚚
+                </div>
 
-            <header className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-3' : 'bg-[var(--color-background)] py-5'}`}>
-                <div className="container mx-auto px-4 md:px-6">
-                    <div className="flex items-center justify-between">
+                <header className={`transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-3' : 'bg-[var(--color-background)] py-5'}`}>
+                    <div className="container mx-auto px-4 md:px-6">
+                        <div className="flex items-center justify-between">
 
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="lg:hidden text-[var(--color-primary)] p-2 hover:bg-[var(--color-primary)]/10 rounded-full transition-colors"
-                            onClick={() => setMobileMenuOpen(true)}
-                            aria-label="Open menu"
-                        >
-                            <FiMenu size={24} />
-                        </button>
+                            {/* Mobile Menu Button */}
+                            <button
+                                className="lg:hidden text-[var(--color-primary)] p-2 hover:bg-[var(--color-primary)]/10 rounded-full transition-colors"
+                                onClick={() => setMobileMenuOpen(true)}
+                                aria-label="Open menu"
+                            >
+                                <FiMenu size={24} />
+                            </button>
 
-                        {/* Logo */}
-                        <Link to="/" className="flex items-center gap-2 group">
-                            <img src={logoImg} alt="Cookie Heaven Logo" className="h-12 md:h-14 w-12 md:w-14 rounded-full object-cover border-2 border-[var(--color-primary)]/10 shadow-sm transform group-hover:rotate-12 transition-transform duration-300" />
-                            <span className="font-['Poppins'] font-bold text-2xl md:text-3xl text-[var(--color-primary)] tracking-tight">
-                                Cookie Heaven
-                            </span>
-                        </Link>
+                            {/* Logo */}
+                            <Link to="/" className="flex items-center gap-2 group">
+                                <img src={logoImg} alt="Cookie Heaven Logo" className="h-12 md:h-14 w-12 md:w-14 rounded-full object-cover border-2 border-[var(--color-primary)]/10 shadow-sm transform group-hover:rotate-12 transition-transform duration-300" />
+                                <span className="font-['Poppins'] font-bold text-2xl md:text-3xl text-[var(--color-primary)] tracking-tight">
+                                    Cookie Heaven
+                                </span>
+                            </Link>
 
-                        {/* Desktop Navigation */}
-                        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-                            {mainLinks.map((link) => (
-                                <div
-                                    key={link.label}
-                                    className="relative group"
-                                    onMouseEnter={() => setActiveDropdown(link.label)}
-                                    onMouseLeave={() => setActiveDropdown(null)}
-                                >
-                                    <NavLink
-                                        to={link.path}
-                                        className={({ isActive }) => `
+                            {/* Desktop Navigation */}
+                            <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+                                {mainLinks.map((link) => (
+                                    <div
+                                        key={link.label}
+                                        className="relative group"
+                                        onMouseEnter={() => setActiveDropdown(link.label)}
+                                        onMouseLeave={() => setActiveDropdown(null)}
+                                    >
+                                        <NavLink
+                                            to={link.path}
+                                            className={({ isActive }) => `
                       flex items-center gap-1 px-4 py-2 font-semibold rounded-full transition-colors duration-300
                       ${isActive ? 'text-[var(--color-secondary)] bg-[var(--color-secondary)]/10' : 'text-[var(--color-text)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5'}
                     `}
-                                    >
-                                        {link.label}
-                                        {link.dropdown && <FiChevronDown className={`transition-transform duration-300 ${activeDropdown === link.label ? 'rotate-180' : ''}`} />}
-                                    </NavLink>
+                                        >
+                                            {link.label}
+                                            {link.dropdown && <FiChevronDown className={`transition-transform duration-300 ${activeDropdown === link.label ? 'rotate-180' : ''}`} />}
+                                        </NavLink>
 
-                                    {/* Dropdown Menu */}
-                                    {link.dropdown && (
-                                        <AnimatePresence>
-                                            {activeDropdown === link.label && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, y: 10 }}
-                                                    transition={{ duration: 0.2 }}
-                                                    className="absolute left-0 top-full pt-2 min-w-[220px]"
-                                                >
-                                                    <div className="bg-white rounded-2xl shadow-xl p-2 border border-[var(--color-primary)]/10 flex flex-col gap-1 relative overflow-hidden">
-                                                        {/* Decorative top bar */}
-                                                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+                                        {/* Dropdown Menu */}
+                                        {link.dropdown && (
+                                            <AnimatePresence>
+                                                {activeDropdown === link.label && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: 10 }}
+                                                        transition={{ duration: 0.2 }}
+                                                        className="absolute left-0 top-full pt-2 min-w-[220px]"
+                                                    >
+                                                        <div className="bg-white rounded-2xl shadow-xl p-2 border border-[var(--color-primary)]/10 flex flex-col gap-1 relative overflow-hidden">
+                                                            {/* Decorative top bar */}
+                                                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
 
-                                                        {link.dropdown.map(subItem => (
-                                                            <Link
-                                                                key={subItem.label}
-                                                                to={subItem.path}
-                                                                className="px-4 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-primary)]/5 hover:text-[var(--color-primary)] hover:pl-6 transition-all duration-300 rounded-xl"
-                                                            >
-                                                                {subItem.label}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    )}
-                                </div>
-                            ))}
-                        </nav>
+                                                            {link.dropdown.map(subItem => (
+                                                                <Link
+                                                                    key={subItem.label}
+                                                                    to={subItem.path}
+                                                                    className="px-4 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-primary)]/5 hover:text-[var(--color-primary)] hover:pl-6 transition-all duration-300 rounded-xl"
+                                                                >
+                                                                    {subItem.label}
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        )}
+                                    </div>
+                                ))}
+                            </nav>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-2 md:gap-4">
-                            {isLoggedIn && user ? (
-                                <div className="hidden md:flex items-center gap-3 mr-2 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full shadow-sm">
-                                    {user.picture ? (
-                                        <img src={user.picture} alt={user.name || user.email} className="w-7 h-7 rounded-full object-cover border border-white shadow-sm" />
-                                    ) : (
-                                        <div className="w-7 h-7 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-xs font-bold font-['Poppins'] shadow-sm">
-                                            {(user.name || user.email)?.charAt(0)?.toUpperCase()}
-                                        </div>
-                                    )}
-                                    <span className="text-sm font-semibold text-gray-700 hidden lg:block">
-                                        {user.loginMethod === 'email' ? user.email : `Welcome, ${user.name}`}
-                                    </span>
-                                    <button
-                                        onClick={() => {
-                                            logout();
-                                        }}
-                                        className="text-xs font-medium text-red-500 hover:text-red-700 ml-1 transition-colors hover:underline"
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
-                            ) : (
-                                <Link to="/login" className="hidden md:flex items-center gap-2 font-semibold text-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors p-2">
-                                    <FiUser size={20} /> <span className="hidden xl:inline">Login</span>
-                                </Link>
-                            )}
-
-                            <button
-                                onClick={onCartClick}
-                                className="relative p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 rounded-full transition-colors group"
-                                aria-label="View shopping cart"
-                            >
-                                <FiShoppingCart size={24} className="group-hover:scale-110 transition-transform" />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-[var(--color-secondary)] text-white text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
-                                        {cartCount}
-                                    </span>
+                            {/* Actions */}
+                            <div className="flex items-center gap-2 md:gap-4">
+                                {isLoggedIn && user ? (
+                                    <div className="hidden md:flex items-center gap-3 mr-2 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full shadow-sm">
+                                        {user.picture ? (
+                                            <img src={user.picture} alt={user.name || user.email} className="w-7 h-7 rounded-full object-cover border border-white shadow-sm" />
+                                        ) : (
+                                            <div className="w-7 h-7 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-xs font-bold font-['Poppins'] shadow-sm">
+                                                {(user.name || user.email)?.charAt(0)?.toUpperCase()}
+                                            </div>
+                                        )}
+                                        <span className="text-sm font-semibold text-gray-700 hidden lg:block">
+                                            {user.loginMethod === 'email' ? user.email : `Welcome, ${user.name}`}
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                logout();
+                                            }}
+                                            className="text-xs font-medium text-red-500 hover:text-red-700 ml-1 transition-colors hover:underline"
+                                        >
+                                            Logout
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <Link to="/login" className="hidden md:flex items-center gap-2 font-semibold text-[var(--color-primary)] hover:text-[var(--color-secondary)] transition-colors p-2">
+                                        <FiUser size={20} /> <span className="hidden xl:inline">Login</span>
+                                    </Link>
                                 )}
-                            </button>
 
-                            <Link to="/shop" className="hidden lg:inline-flex btn btn-primary py-2.5 px-6 ml-2 text-sm">
-                                Order Now
-                            </Link>
+                                <button
+                                    onClick={onCartClick}
+                                    className="relative p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 rounded-full transition-colors group"
+                                    aria-label="View shopping cart"
+                                >
+                                    <FiShoppingCart size={24} className="group-hover:scale-110 transition-transform" />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-[var(--color-secondary)] text-white text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </button>
+
+                                <Link to="/shop" className="hidden lg:inline-flex btn btn-primary py-2.5 px-6 ml-2 text-sm">
+                                    Order Now
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </header>
+                </header>
+            </div>
 
             {/* Mobile sidebar */}
             <AnimatePresence>
