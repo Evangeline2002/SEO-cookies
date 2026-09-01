@@ -162,8 +162,8 @@ export default function Home() {
                                     )}
 
                                     <div className="bg-[#FFFDF8] rounded-2xl aspect-square mb-5 flex items-center justify-center text-7xl overflow-hidden relative shadow-inner">
-                                        {product.product_image ? (
-                                            <img src={`${imgBaseUrl}${product.product_image}`} alt={`${product.product_name} cookie`} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        {product.has_image || product.product_image ? (
+                                            <img src={product.has_image ? `${api.defaults.baseURL}/products/${product.id}/image` : `${imgBaseUrl}${product.product_image}`} alt={`${product.product_name} cookie`} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                         ) : (
                                             <span>🍪</span>
                                         )}

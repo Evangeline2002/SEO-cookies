@@ -103,8 +103,8 @@ export default function ProductDetail() {
                                 transition={{ type: "spring", damping: 15 }}
                                 className={`drop-shadow-2xl filter ${product.product_image ? 'w-full h-80 flex items-center justify-center' : 'text-9xl md:text-[12rem]'}`}
                             >
-                                {product.product_image ? (
-                                    <img src={`${imgBaseUrl}${product.product_image}`} alt={product.product_name} className="w-full h-full object-cover rounded-full shadow-lg border-4 border-white/50" />
+                                {product.has_image || product.product_image ? (
+                                    <img src={product.has_image ? `${api.defaults.baseURL}/products/${product.id}/image` : `${imgBaseUrl}${product.product_image}`} alt={product.product_name} className="w-full h-full object-cover rounded-full shadow-lg border-4 border-white/50" />
                                 ) : (
                                     <span>🍪</span>
                                 )}

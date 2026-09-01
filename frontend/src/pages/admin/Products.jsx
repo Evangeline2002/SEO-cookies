@@ -68,7 +68,10 @@ export default function Products() {
       status: product.status || 'Active'
     });
     setImage(null);
-    setImagePreview(product.product_image ? `${imgBaseUrl}/uploads/products/${product.product_image.replace(/^[/\\]?uploads[/\\]/, '')}` : null);
+    let previewUrl = null;
+    if (product.has_image) previewUrl = `${api.defaults.baseURL}/products/${product.id}/image`;
+    else if (product.product_image) previewUrl = `${imgBaseUrl}/uploads/products/${product.product_image.replace(/^[/\\]?uploads[/\\]/, '')}`;
+    setImagePreview(previewUrl);
     setShowModal(true);
   };
 
@@ -108,9 +111,10 @@ export default function Products() {
     }
   };
 
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    return `${imgBaseUrl}/uploads/products/${path.replace(/^[/\\]?uploads[/\\]/, '')}`;
+  const getImageUrl = (product) => {
+    if (product.has_image) return `${api.defaults.baseURL}/products/${product.id}/image`;
+    if (product.product_image) return `${imgBaseUrl}/uploads/products/${product.product_image.replace(/^[/\\]?uploads[/\\]/, '')}`;
+    return null;
   };
 
   return (
@@ -153,8 +157,8 @@ export default function Products() {
                   <tr key={product.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {product.product_image ? (
-                          <img src={getImageUrl(product.product_image)} alt={product.product_name} className="w-10 h-10 rounded-lg object-cover" />
+                        {product.has_image || product.product_image ? (
+                          <img src={getImageUrl(product)} alt={product.product_name} className="w-10 h-10 rounded-lg object-cover" />
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
                             <span className="text-[10px] text-gray-400">No Img</span>

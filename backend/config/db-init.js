@@ -261,6 +261,22 @@ export async function initDatabase() {
             }
         }
 
+        const productsBlobColumns = {
+            image_data: "ADD COLUMN image_data LONGBLOB",
+            image_name: "ADD COLUMN image_name VARCHAR(255)",
+            image_type: "ADD COLUMN image_type VARCHAR(100)"
+        };
+        for (const [col, ddl] of Object.entries(productsBlobColumns)) {
+            const [cols] = await conn.query(
+                `SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME='products' AND COLUMN_NAME=?`,
+                [DB_NAME, col]
+            );
+            if (cols.length === 0) {
+                await conn.query(`ALTER TABLE products ${ddl}`);
+                console.log(`✔ Migration: products.${col} added.`);
+            }
+        }
+
         await conn.query(`
             CREATE TABLE IF NOT EXISTS reviews (
                 id INT AUTO_INCREMENT PRIMARY KEY,

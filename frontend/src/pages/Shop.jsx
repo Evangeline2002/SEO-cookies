@@ -195,8 +195,8 @@ export default function Shop() {
                                             {/* Fake Image Container */}
                                             <Link to={`/product/${product.id}`} className="block">
                                                 <div className="bg-[#FFFDF8] rounded-2xl h-56 mb-5 flex items-center justify-center group-hover:scale-105 transition-transform duration-500 border border-[var(--color-primary)]/5 overflow-hidden relative">
-                                                    {product.product_image ? (
-                                                        <img src={`${imgBaseUrl}${product.product_image}`} alt={product.product_name} className="w-full h-full object-cover !scale-100" />
+                                                    {product.has_image || product.product_image ? (
+                                                        <img src={product.has_image ? `${api.defaults.baseURL}/products/${product.id}/image` : `${imgBaseUrl}${product.product_image}`} alt={product.product_name} className="w-full h-full object-cover !scale-100" />
                                                     ) : (
                                                         <span className="text-7xl">🍪</span>
                                                     )}

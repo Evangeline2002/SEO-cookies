@@ -8,19 +8,9 @@ import { getAll, getById, getByCategory, create, update, remove } from '../contr
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 import fs from 'fs';
+import { getImage } from '../controllers/productController.js';
 
-const uploadsDir = path.join(__dirname, '..', 'uploads', 'products');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: uploadsDir,
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname.replace(/\\s+/g, '-')}`);
-    }
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 const router = Router();
@@ -28,6 +18,7 @@ const router = Router();
 // Temporarily removing auth from GET for frontend store display
 router.get('/', getAll);
 router.get('/:id', getById);
+router.get('/:id/image', getImage);
 router.get('/category/:categoryId', getByCategory);
 
 // Admin authenticated routes
