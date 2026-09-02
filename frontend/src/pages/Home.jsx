@@ -61,9 +61,26 @@ export default function Home() {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const prodRes = await api.get('/products');
-                const targetCookies = ["Chocolate Chip Cookie", "Nutella Cookie", "Double Chocolate Cookie"];
-                setBestSellers(prodRes.data.filter(p => p.status === 'Active' && targetCookies.includes(p.product_name)).slice(0, 3));
+                const [prodRes, catRes] = await Promise.all([
+                    api.get('/products'),
+                    api.get('/categories')
+                ]);
+
+                const cookiesCategory = catRes.data.find(c => c.category_name?.toLowerCase() === 'cookies');
+                const activeProducts = prodRes.data.filter(p => p.status === 'Active');
+
+                let cookieProducts = [];
+                if (cookiesCategory) {
+                    cookieProducts = activeProducts.filter(p => p.category_id === cookiesCategory.id);
+                } else {
+                    cookieProducts = activeProducts.filter(p => p.product_name?.toLowerCase().includes('cookie') || p.category_name?.toLowerCase().includes('cookie'));
+                }
+
+                const randomCookies = [...cookieProducts]
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, 3);
+
+                setBestSellers(randomCookies);
             } catch (err) {
                 console.error("Error fetching home data:", err);
             } finally {
