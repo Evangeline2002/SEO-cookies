@@ -27,28 +27,28 @@ const staticCategories = [
         desc: "Beautifully packed treats made for gifting.",
         btn: "Explore Gifts →",
         img: giftBoxesImg,
-        link: "/shop?category=gifts"
+        link: "/menu?category=gifts"
     },
     {
         title: "COMBO BOXES",
         desc: "A delicious collection of your favourite treats.",
         btn: "View Combos →",
         img: comboBoxesImg,
-        link: "/shop?category=combos"
+        link: "/menu?category=combos"
     },
     {
         title: "BAKERY SPECIALS",
         desc: "Freshly baked favourites for every occasion.",
         btn: "Explore Specials →",
         img: bakerySpecialsImg,
-        link: "/shop?category=specials"
+        link: "/menu?category=specials"
     },
     {
         title: "CELEBRATION BOXES",
         desc: "Make every celebration extra sweet.",
         btn: "Shop Celebration →",
         img: celebrationBoxesImg,
-        link: "/shop?category=celebration"
+        link: "/menu?category=celebration"
     }
 ];
 

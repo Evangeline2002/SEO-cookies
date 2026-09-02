@@ -14,10 +14,25 @@ const fadeIn = {
 
 export default function Shop() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const catParam = searchParams.get('cat');
     const typeParam = searchParams.get('type');
 
-    const [activeCategory, setActiveCategory] = useState(catParam || 'All');
+    const catQuery = searchParams.get('category');
+    const catParam = searchParams.get('cat');
+
+    let initialCategory = 'All';
+    if (catParam) {
+        initialCategory = catParam;
+    } else if (catQuery) {
+        const queryMap = {
+            'gifts': 'Gift Boxes',
+            'combos': 'Combo Boxes',
+            'specials': 'Bakery Specials',
+            'celebration': 'Celebration Boxes'
+        };
+        initialCategory = queryMap[catQuery.toLowerCase()] || catQuery;
+    }
+
+    const [activeCategory, setActiveCategory] = useState(initialCategory);
     const [sortBy, setSortBy] = useState('featured');
     const { addToCart } = useCart();
     const [products, setProducts] = useState([]);
@@ -55,8 +70,17 @@ export default function Shop() {
 
         // Category filter
         if (activeCategory !== 'All') {
-            const catMatch = categories.find(c => c.category_name === activeCategory);
-            if (catMatch) result = result.filter(p => p.category_id === catMatch.id);
+            const catMatch = categories.find(c => c.category_name?.toLowerCase() === activeCategory.toLowerCase());
+            if (catMatch) {
+                result = result.filter(p => p.category_id === catMatch.id);
+            } else {
+                // Fallback: literal string match on category_name or product_name
+                const searchKeyword = activeCategory.toLowerCase().replace(' boxes', '').replace(' specials', '').trim();
+                result = result.filter(p =>
+                    p.category_name?.toLowerCase().includes(searchKeyword) ||
+                    p.product_name?.toLowerCase().includes(searchKeyword)
+                );
+            }
         }
 
         // Type queries
