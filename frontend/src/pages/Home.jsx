@@ -62,7 +62,8 @@ export default function Home() {
         const fetchHomeData = async () => {
             try {
                 const prodRes = await api.get('/products');
-                setBestSellers(prodRes.data.filter(p => p.status === 'Active' && p.best_seller).slice(0, 6));
+                const targetCookies = ["Chocolate Chip Cookie", "Nutella Cookie", "Double Chocolate Cookie"];
+                setBestSellers(prodRes.data.filter(p => p.status === 'Active' && targetCookies.includes(p.product_name)).slice(0, 3));
             } catch (err) {
                 console.error("Error fetching home data:", err);
             } finally {
@@ -132,7 +133,7 @@ export default function Home() {
                             <h2 className="text-4xl md:text-5xl font-extrabold text-[#8b4513] mb-4 font-['Poppins']">Our Best Sellers</h2>
                             <p className="text-lg text-gray-600">The treats everyone is talking about.</p>
                         </div>
-                        <Link to="/shop" className="text-[#8B4513] font-bold hover:text-[#e07a5f] flex items-center gap-2 transition-colors">
+                        <Link to="/menu" className="text-[#8B4513] font-bold hover:text-[#e07a5f] flex items-center gap-2 transition-colors">
                             View Entire Menu <FiArrowRight />
                         </Link>
                     </div>
@@ -141,7 +142,7 @@ export default function Home() {
                         <div className="text-center py-16 px-4 bg-gray-50 rounded-3xl border border-dashed border-gray-300">
                             <span className="text-6xl mb-4 block">🧁</span>
                             <p className="text-xl text-gray-500 mb-6 font-medium">No products available in this category yet.</p>
-                            <Link to="/shop" className="btn bg-[#8B4513] hover:bg-[#6e350d] text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1">
+                            <Link to="/menu" className="btn bg-[#8B4513] hover:bg-[#6e350d] text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1">
                                 View All Products →
                             </Link>
                         </div>
@@ -151,7 +152,7 @@ export default function Home() {
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, margin: "-100px" }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 h-auto"
+                            className="grid grid-cols-1 md:grid-cols-3 gap-8 h-auto"
                         >
                             {bestSellers.map(product => (
                                 <motion.div key={product.id} variants={fadeIn} className="bg-white rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group relative flex flex-col h-full">

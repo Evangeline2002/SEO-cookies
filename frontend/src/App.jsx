@@ -45,6 +45,7 @@ function App() {
         {/* Customer Routes with Header/Footer */}
         <Route path="/" element={<CustomerLayout />}>
           <Route index element={<Home />} />
+          <Route path="menu" element={<Shop />} />
           <Route path="shop" element={<Shop />} />
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="about" element={<About />} />
