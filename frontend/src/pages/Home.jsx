@@ -73,7 +73,7 @@ export default function Home() {
                 if (cookiesCategory) {
                     cookieProducts = activeProducts.filter(p => p.category_id === cookiesCategory.id);
                 } else {
-                    cookieProducts = activeProducts.filter(p => p.product_name?.toLowerCase().includes('cookie') || p.category_name?.toLowerCase().includes('cookie'));
+                    cookieProducts = activeProducts.filter(p => p.product_name?.toLowerCase()?.includes('cookie') || p.category_name?.toLowerCase()?.includes('cookie'));
                 }
 
                 const randomCookies = [...cookieProducts]
