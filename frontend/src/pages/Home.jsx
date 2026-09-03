@@ -10,7 +10,6 @@ import HeroSection from '../components/HeroSection';
 import giftBoxesImg from '../assets/Premium Assorted Gift Box.jpg';
 import comboBoxesImg from '../assets/family gift box.jpg';
 import bakerySpecialsImg from '../assets/biscoff cheese cake.jpg';
-import celebrationBoxesImg from '../assets/anniversary gift box.jpg';
 
 const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -41,14 +40,7 @@ const staticCategories = [
         desc: "Freshly baked favourites for every occasion.",
         btn: "Explore Specials →",
         img: bakerySpecialsImg,
-        link: "/menu?category=specials"
-    },
-    {
-        title: "CELEBRATION BOXES",
-        desc: "Make every celebration extra sweet.",
-        btn: "Shop Celebration →",
-        img: celebrationBoxesImg,
-        link: "/menu?category=celebration"
+        link: "/menu?category=cake"
     }
 ];
 
@@ -109,7 +101,7 @@ export default function Home() {
                         <p className="text-gray-600 text-lg">Perfect gifts, delicious combos, and sweet treats for every occasion.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto h-auto relative">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto h-auto relative">
                         {staticCategories.map((cat, i) => (
                             <motion.div
                                 key={i}

@@ -27,6 +27,7 @@ export default function Shop() {
             'gifts': 'Gift Boxes',
             'combos': 'Combo Boxes',
             'specials': 'Bakery Specials',
+            'cake': 'Bakery Specials',
             'celebration': 'Celebration Boxes'
         };
         initialCategory = queryMap[catQuery.toLowerCase()] || catQuery;
