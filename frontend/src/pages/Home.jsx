@@ -48,37 +48,42 @@ export default function Home() {
     const { addToCart } = useCart();
     const [bestSellers, setBestSellers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
     const imgBaseUrl = api.defaults.baseURL.replace('/api', '');
 
-    useEffect(() => {
-        const fetchHomeData = async () => {
-            try {
-                const [prodRes, catRes] = await Promise.all([
-                    api.get('/products'),
-                    api.get('/categories')
-                ]);
+    const fetchHomeData = async () => {
+        try {
+            setLoading(true);
+            setError(false);
+            const [prodRes, catRes] = await Promise.all([
+                api.get('/products'),
+                api.get('/categories')
+            ]);
 
-                const cookiesCategory = catRes.data.find(c => c.category_name?.toLowerCase() === 'cookies');
-                const activeProducts = prodRes.data.filter(p => p.status === 'Active');
+            const cookiesCategory = catRes.data.find(c => c.category_name?.toLowerCase() === 'cookies');
+            const activeProducts = prodRes.data.filter(p => p.status === 'Active');
 
-                let cookieProducts = [];
-                if (cookiesCategory) {
-                    cookieProducts = activeProducts.filter(p => p.category_id === cookiesCategory.id);
-                } else {
-                    cookieProducts = activeProducts.filter(p => p.product_name?.toLowerCase()?.includes('cookie') || p.category_name?.toLowerCase()?.includes('cookie'));
-                }
-
-                const randomCookies = [...cookieProducts]
-                    .sort(() => Math.random() - 0.5)
-                    .slice(0, 3);
-
-                setBestSellers(randomCookies);
-            } catch (err) {
-                console.error("Error fetching home data:", err);
-            } finally {
-                setLoading(false);
+            let cookieProducts = [];
+            if (cookiesCategory) {
+                cookieProducts = activeProducts.filter(p => p.category_id === cookiesCategory.id);
+            } else {
+                cookieProducts = activeProducts.filter(p => p.product_name?.toLowerCase()?.includes('cookie') || p.category_name?.toLowerCase()?.includes('cookie'));
             }
-        };
+
+            const randomCookies = [...cookieProducts]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+
+            setBestSellers(randomCookies);
+        } catch (err) {
+            console.error("Error fetching home data:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchHomeData();
     }, []);
 
@@ -147,13 +152,20 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    {!loading && bestSellers.length === 0 ? (
+                    {!loading && !error && bestSellers.length === 0 ? (
                         <div className="text-center py-16 px-4 bg-gray-50 rounded-3xl border border-dashed border-gray-300">
                             <span className="text-6xl mb-4 block">🧁</span>
                             <p className="text-xl text-gray-500 mb-6 font-medium">No products available in this category yet.</p>
                             <Link to="/menu" className="btn bg-[#8B4513] hover:bg-[#6e350d] text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1">
                                 View All Products →
                             </Link>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-16 px-4 bg-red-50 rounded-3xl border border-dashed border-red-200">
+                            <p className="text-xl text-red-600 mb-6 font-medium">Unable to load products. Please try again.</p>
+                            <button onClick={fetchHomeData} className="btn bg-[#8B4513] hover:bg-[#6e350d] text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1">
+                                Try Again
+                            </button>
                         </div>
                     ) : (
                         <motion.div
@@ -163,7 +175,20 @@ export default function Home() {
                             viewport={{ once: true, margin: "-100px" }}
                             className="grid grid-cols-1 md:grid-cols-3 gap-8 h-auto"
                         >
-                            {bestSellers.map(product => (
+                            {loading ? (
+                                Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={`skeleton-${i}`} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col h-full animate-pulse">
+                                        <div className="bg-gray-200 rounded-2xl w-full aspect-square mb-5"></div>
+                                        <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                                        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                                        <div className="h-4 bg-gray-200 rounded w-5/6 mb-auto"></div>
+                                        <div className="flex gap-2 w-full mt-4">
+                                            <div className="flex-1 h-12 bg-gray-200 rounded-xl"></div>
+                                            <div className="flex-1 h-12 bg-gray-200 rounded-xl"></div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : bestSellers.map(product => (
                                 <motion.div key={product.id} variants={fadeIn} className="bg-white rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group relative flex flex-col h-full">
                                     {product.new_arrival && (
                                         <span className="absolute top-4 left-4 z-10 px-3 py-1 text-xs font-bold uppercase rounded-full text-white bg-[#e07a5f]">
