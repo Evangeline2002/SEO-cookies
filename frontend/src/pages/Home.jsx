@@ -55,26 +55,8 @@ export default function Home() {
         try {
             setLoading(true);
             setError(false);
-            const [prodRes, catRes] = await Promise.all([
-                api.get('/products'),
-                api.get('/categories')
-            ]);
-
-            const cookiesCategory = catRes.data.find(c => c.category_name?.toLowerCase() === 'cookies');
-            const activeProducts = prodRes.data.filter(p => p.status === 'Active');
-
-            let cookieProducts = [];
-            if (cookiesCategory) {
-                cookieProducts = activeProducts.filter(p => p.category_id === cookiesCategory.id);
-            } else {
-                cookieProducts = activeProducts.filter(p => p.product_name?.toLowerCase()?.includes('cookie') || p.category_name?.toLowerCase()?.includes('cookie'));
-            }
-
-            const randomCookies = [...cookieProducts]
-                .sort(() => Math.random() - 0.5)
-                .slice(0, 3);
-
-            setBestSellers(randomCookies);
+            const res = await api.get('/products/bestsellers');
+            setBestSellers(res.data);
         } catch (err) {
             console.error("Error fetching home data:", err);
             setError(true);
@@ -198,7 +180,21 @@ export default function Home() {
 
                                     <div className="bg-[#FFFDF8] rounded-2xl aspect-square mb-5 flex items-center justify-center text-7xl overflow-hidden relative shadow-inner">
                                         {product.has_image || product.product_image ? (
-                                            <img src={product.has_image ? `${api.defaults.baseURL}/products/${product.id}/image` : `${imgBaseUrl}${product.product_image}`} alt={`${product.product_name} cookie`} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            <>
+                                                <img
+                                                    src={product.has_image ? `${api.defaults.baseURL}/products/${product.id}/image` : `${imgBaseUrl}${product.product_image}`}
+                                                    alt={`${product.product_name} cookie`}
+                                                    loading="lazy"
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                        if (e.currentTarget.nextElementSibling) {
+                                                            e.currentTarget.nextElementSibling.style.display = 'block';
+                                                        }
+                                                    }}
+                                                />
+                                                <span style={{ display: 'none' }}>🍪</span>
+                                            </>
                                         ) : (
                                             <span>🍪</span>
                                         )}

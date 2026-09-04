@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import auth from '../middleware/auth.js';
-import { getAll, getById, getByCategory, create, update, remove } from '../controllers/productController.js';
+import { getAll, getById, getByCategory, create, update, remove, getBestSellers } from '../controllers/productController.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,6 +17,7 @@ const router = Router();
 
 // Temporarily removing auth from GET for frontend store display
 router.get('/', getAll);
+router.get('/bestsellers', getBestSellers);
 router.get('/:id', getById);
 router.get('/:id/image', getImage);
 router.get('/category/:categoryId', getByCategory);

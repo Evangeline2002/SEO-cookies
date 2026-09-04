@@ -27,6 +27,30 @@ export async function getAll(req, res) {
     } catch (err) { res.status(500).json({ error: err.message }); }
 }
 
+export async function getBestSellers(req, res) {
+    try {
+        let [rows] = await pool.query('SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.best_seller = 1 AND p.status = "Active" ORDER BY p.created_at DESC LIMIT 3');
+
+        if (rows.length < 3) {
+            // Fallback for missing best sellers, to guarantee exact 3 are returned
+            // using created_at for consistency across refreshes, avoiding RAND()
+            const [fallbackRows] = await pool.query('SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = "Active" ORDER BY p.created_at DESC LIMIT 3');
+            rows = fallbackRows;
+        }
+
+        const cleanRows = rows.map(r => {
+            if (r.image_data) {
+                delete r.image_data;
+                r.has_image = true;
+            }
+            return r;
+        });
+
+        res.json(cleanRows);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+}
+
+
 export async function getById(req, res) {
     try {
         const [rows] = await pool.query('SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?', [req.params.id]);
